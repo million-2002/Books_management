@@ -1,6 +1,7 @@
-from mysql3 import *
+from library import *
 @app.route('/delete_author/<author_id>')
 def delete_author(author_id):
+
     author = Author.query.get(author_id)
     #get()，参数为主键，如果主键不存在没有返回内容,返回主键键值对象
     if author:
@@ -20,7 +21,7 @@ def delete_author(author_id):
     else:
         flash('作者没找到')
     return redirect(url_for('index'))
-#
+
 @app.route('/delete_category/<category_id>')
 def delete_category(category_id):
     #查询是否存在该ID的书
@@ -77,6 +78,7 @@ def delete_language(language_id):
         flash('语言没有找到')
     # url_for传入视图函数名,返回该视图函数对应的路由地址
     # redirect()，功能就是跳转到指定的url
+
     return redirect(url_for('index'))
 @app.route('/delete_book/<book_id>')
 def delete_book(book_id):
@@ -97,4 +99,23 @@ def delete_book(book_id):
     #url_for传入视图函数名,返回该视图函数对应的路由地址
     #redirect()，功能就是跳转到指定的url
     return redirect(url_for('index'))
+@app.route('/delete_register/<register_id>')
+def delete_register(register_id):
+    # 查询是否存在该ID的书
+    r = Register.query.get(register_id)
+    # 如果有就删除
+    if r:
+        try:
+            db.session.delete(r)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            flash('退出登录失败')
+            db.session.rollback()
+    else:
+        #书籍不存在提示错误
+        flash('未找到用户')
+    #url_for传入视图函数名,返回该视图函数对应的路由地址
+    #redirect()，功能就是跳转到指定的url
+    return redirect(url_for('multi_form'))
 

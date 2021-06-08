@@ -27,11 +27,21 @@ class Press(db.Model):
     #def __repr__(self):
      #   return 'Press :%s' % self.name
     #语言
+
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)#主键
+    user_name = db.Column(db.String(16), unique=False)
+    user_password = db.Column(db.Integer, unique=True)
+class Register(db.Model):
+    __tablename__ = 'register'
+    id = db.Column(db.Integer, primary_key=True)#主键
+    register_name = db.Column(db.String(16), unique=False)
+    register_password = db.Column(db.Integer, unique=True)
 class Language(db.Model):
     __tablename__ = 'language'
     id = db.Column(db.Integer, primary_key=True)#主键
-    language_name = db.Column(db.String(16), unique=False)
-
+    language_name = db.Column(db.String(16), unique=True)
   #  def __repr__(self):
    #     return 'Language :%s' % self.name
     #类型
@@ -54,7 +64,6 @@ class Book(db.Model):
     '''
     author_id = db.Column(db.Integer,db.ForeignKey('authors.id'))
     Category_id = db.Column(db.Integer, db.ForeignKey('cagetory.id'))
-
     Press_id = db.Column(db.Integer, db.ForeignKey('press.id'))
     Language_id = db.Column(db.Integer, db.ForeignKey('language.id'))'''
     #authors = db.relationship('Author',backref='author')
