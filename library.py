@@ -1,4 +1,7 @@
+import time
 from mysql3 import *
+import string
+import random
 #作者模型
 class Author(db.Model):
     __tablename__ = 'authors'
@@ -16,9 +19,10 @@ class Goods(db.Model):
     __tablename__ = 'goods'
     id = db.Column(db.Integer, primary_key=True)  # 主键
     Goods_id = db.Column(db.Integer,db.ForeignKey('books.id'))
-
+'''
     def __repr__(self):
         return 'Goods :%s' % self.name
+        '''
     #出版社
 class Press(db.Model):
     __tablename__ = 'press'
@@ -31,17 +35,26 @@ class Press(db.Model):
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)#主键
-    user_name = db.Column(db.String(16), unique=False)
-    user_password = db.Column(db.Integer, unique=True)
+    user_name = db.Column(db.String(16), unique=True)
+    user_password = db.Column(db.String(16), unique=True)
+class BORROW(db.Model):
+    __tablename__ = 'borrow'
+    id = db.Column(db.Integer, primary_key=True)#主键
+    time = db.Column(db.String(16), unique=False)
+    Register_id = db.Column(db.Integer,db.ForeignKey('register.id'))
+    Book_id = db.Column(db.Integer,db.ForeignKey('books.id'))
+
 class Register(db.Model):
     __tablename__ = 'register'
     id = db.Column(db.Integer, primary_key=True)#主键
     register_name = db.Column(db.String(16), unique=False)
-    register_password = db.Column(db.Integer, unique=True)
+    register_password = db.Column(db.String(16), unique=True)
+
+
 class Language(db.Model):
     __tablename__ = 'language'
     id = db.Column(db.Integer, primary_key=True)#主键
-    language_name = db.Column(db.String(16), unique=True)
+    language_name = db.Column(db.String(16), unique=False)
   #  def __repr__(self):
    #     return 'Language :%s' % self.name
     #类型
@@ -61,80 +74,105 @@ class Book(db.Model):
     number = db.Column(db.Integer, unique=False)
 
     #unique=True表示重复出现的记录只保存一条
-    '''
+
     author_id = db.Column(db.Integer,db.ForeignKey('authors.id'))
-    Category_id = db.Column(db.Integer, db.ForeignKey('cagetory.id'))
+    Category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     Press_id = db.Column(db.Integer, db.ForeignKey('press.id'))
-    Language_id = db.Column(db.Integer, db.ForeignKey('language.id'))'''
+    Language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
     #authors = db.relationship('Author',backref='author')
 
-#传入表单
+
 
 if __name__ == '__main__':
     db.drop_all() # 删除表
     db.create_all() # 创建表
     #往Author表里插数据
-    au1 = Author(author_name='老王')
-    au2 = Author(author_name='老宋')
-    au3 = Author(author_name='老刘')
-    db.session.add_all([au1, au2, au3])
+    a = []
+    for i in range(50):
+        a1 = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(10))
+        a.append(Author(author_name = a1))
+    db.session.add_all(a)
+    db.session.commit()
+    us = []
+    re = []
+    for i in range(50):
+        n = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(6))
+        p = ''.join(random.choice( string.digits) for _ in range(12))
+        s = User(user_name = n,user_password = p)
+        r = Register(register_name = n,register_password = p)
+        us.append(s)
+        re.append(r)
+    db.session.add_all(us)
+    db.session.commit()
+    db.session.add_all(re)
+    db.session.commit()
+    c = []
+    c.append(Category(category_name = '计科' ))
+    c.append(Category(category_name = '心理学' ))
+    c.append(Category(category_name = '社会学' ))
+    c.append(Category(category_name = '哲学' ))
+    c.append(Category(category_name = '历史学' ))
+    c.append(Category(category_name = '文学' ))
+    c.append(Category(category_name = '生物学' ))
+    c.append(Category(category_name = '地理学' ))
+    c.append(Category(category_name = '数学' ))
+    db.session.add_all(c)
+    db.session.commit()
+    l = []
+    l.append(Language(language_name='chinese'))
+    l.append(Language(language_name='English'))
+    l.append(Language(language_name='Russian'))
+    l.append(Language(language_name='Latin'))
+    l.append(Language(language_name='Japanese'))
+    l.append(Language(language_name='Spanish'))
+    l.append(Language(language_name='Arab'))
+    db.session.add_all(l)
+    db.session.commit()
+    p = []
+    p.append(Press(press_name='机械工业出版社'))
+    p.append(Press(press_name='人民文学出版社'))
+    p.append(Press(press_name='新华出版社'))
+    p.append(Press(press_name='人民邮电出版社'))
+    db.session.add_all(p)
     db.session.commit()
 
-    c1 = Category(category_name = '计算机' )
-    c2 = Category(category_name = '心理学' )
-    c3 = Category(category_name = '社会学' )
-    c4 = Category(category_name = '哲学' )
-    db.session.add_all([c1, c2, c3, c4])
-    db.session.commit()
+    b = []
+    for i in range(100):
+        n =  ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(6))
+        t1 = (2021,6,9,0,0,0,0,0,0)
+        t2 = (2021,7,9,0,0,0,0,0,0)
+        start = time.mktime(t1)
+        end = time.mktime(t2)
+        t= random.randint(start,end)
+        ti = time.strftime("%Y-%m-%d",time.localtime(t))
+        v =int(random.uniform(10, 600))
+        a_id = int(random.uniform(1,50))
+        c_id = int(random.uniform(1,9))
+        p_id = int(random.uniform(1,4))
+        l_id =int(random.uniform(1,7))
+        b_ = Book(name=n, time=ti, value=v, number=1, author_id=a_id, Category_id=c_id, Press_id=p_id,
+         Language_id=l_id)
+        b.append(b_)
 
-    l1 = Language(language_name = 'chinese' )
-    l2 = Language(language_name = 'English' )
-    l3 = Language(language_name = 'Russian' )
-    l4 = Language(language_name = 'Latin' )
-    db.session.add_all([l1, l2, l3, l4])
+    db.session.add_all(b)
     db.session.commit()
-    p1 = Press(press_name = '机械工业出版社')
-    p2 = Press(press_name = '人民文学出版社')
-    p3 = Press(press_name = '新华出版社' )
-    p4 = Press(press_name = '人民邮电出版社' )
-    db.session.add_all([p1, p2, p3, p4])
-    db.session.commit()
-    bk1 = Book(name='老王回忆录', time='2020-8-29', value=120, number=1)
-    bk2 = Book(name='我读书少你别骗我', time='2020-7-29', value=130, number=1)
-    bk3 = Book(name='如何征服美丽少女', time='2020-6-29', value=140, number=1)
-    bk4 = Book(name='如何征服美丽少男', time='2020-6-29', value=150, number=1)
-    bk5 = Book(name='如何使自己变得更骚', time='2020-6-29', value=160, number=1)
-    bk6 = Book(name='我变秃了，也变强了', time='2020-6-29', value=170, number=1)
-    '''bk1 = Book(name='老王回忆录', time='2020-8-29')
-    bk2 = Book(name='我读书少你别骗我', time='2020-7-29')
-    bk3 = Book(name='如何征服美丽少女', time='2020-6-29')
-    bk4 = Book(name='如何征服美丽少男', time='2020-6-29')
-    bk5 = Book(name='如何使自己变得更骚', time='2020-6-29')
-    bk6 = Book(name='我变秃了，也变强了', time='2020-6-29')'''
-    '''
-    bk1 = Book(name='老王回忆录', time = '2020-8-29', value = 120,number = 1,  author_id = au1.id, Category_id = c1.id, Press_id = p1.id, Language_id = l1.id )
-    bk2 = Book(name='我读书少你别骗我', time = '2020-7-29', value = 130,number = 1,author_id = au1.id,Category_id = c1.id, Press_id = p1.id, Language_id = l1.id)
-    bk3 = Book(name='如何征服美丽少女', time = '2020-6-29', value = 140,number = 1,author_id = au2.id,Category_id = c2.id, Press_id = p2.id, Language_id = l2.id)
-    bk4 = Book(name='如何征服美丽少男', time = '2020-6-29', value = 150,number = 1, author_id = au2.id,Category_id = c2.id, Press_id = p2.id, Language_id = l2.id)
-    bk5 = Book(name='如何使自己变得更骚', time = '2020-6-29', value = 160,number = 1,author_id = au3.id,Category_id = c3.id, Press_id = p3.id, Language_id = l3.id)
-    bk6 = Book(name='我变秃了，也变强了', time = '2020-6-29', value = 170,number = 1,author_id = au3.id,Category_id = c3.id, Press_id = p3.id, Language_id = l3.id)''''''
-    #往附表books里插数据，附表的外键 = 主表的主键'''
-    db.session.add_all([bk1, bk2, bk3, bk4, bk5, bk6])
-
+    bo = []
+    for i in range(100):
+        t1 = (2021, 6, 9, 0, 0, 0, 0, 0, 0)
+        t2 = (2021, 7, 9, 0, 0, 0, 0, 0, 0)
+        start = time.mktime(t1)
+        end = time.mktime(t2)
+        t = random.randint(start, end)
+        ti = time.strftime("%Y-%m-%d", time.localtime(t))
+        borrow_ = BORROW(time = ti, Register_id = int(random.uniform(1,50)), Book_id =int(random.uniform(1,100)))
+        bo.append(borrow_)
+    db.session.add_all(bo)
     db.session.commit()
     #库存
-    g1 = Goods( Goods_id = bk1.id)
-    g2 = Goods(id = 664, Goods_id = bk2.id)
-    g3 = Goods(id = 437, Goods_id = bk3.id)
-    g4 = Goods(id = 765, Goods_id = bk4.id)
-    g5 = Goods(id = 565, Goods_id = bk5.id)
-    g6 = Goods(id = 535, Goods_id = bk6.id)
-    g7 = Goods(id = 356, Goods_id = bk6.id)
-    g8 = Goods(id = 665, Goods_id = bk5.id)
-    g9 = Goods(id = 855, Goods_id = bk5.id)
-
-    db.session.add_all([g1, g2, g3, g4, g5, g6, g7, g8, g9])
-    g1 = Goods(id = g1.id)
+    g= []
+    for i in range(200):
+        g.append(Goods(Goods_id= int(random.uniform(1,100))))
+    db.session.add_all(g)
 
     db.session.commit()
     app.run(debug = True)
